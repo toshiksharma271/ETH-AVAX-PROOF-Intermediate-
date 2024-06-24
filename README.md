@@ -1,28 +1,25 @@
 # Solidity Contract Readme
 
-📄 **requireAssertRevert.sol** - A Simple Solidity Contract for Error Handling
+📄 **Voting.sol** - A Simple Solidity Contract for Voting with Error Handling
 
-This is a simple Solidity contract that demonstrates error handling in Solidity using the `assert`, `revert`, and `require` statements.
+# Voting System
+
+This is a simple Solidity contract that demonstrates error handling in Solidity using the `assert`, `revert`, and `require` statements. The contract implements a voting system where the chairperson can add proposals, give voting rights, allow participants to vote on proposals, and end the voting process.
 
 ## Contract Overview
 
-The `SimpleBank` contract includes the following functionality:
+The `Voting` contract includes the following functionality:
 
-- A private mapping `balances` that stores the Ether balance of each address.
-- A boolean variable `stopped` to manage the contract's active state.
-- A `deposit` function to allow users to deposit Ether into their account.
-- A `withdraw` function to enable users to withdraw Ether from their account.
-- A `stopContract` function to stop the contract.
-- A `resumeContract` function to resume the contract.
-- A `forceRevert` function to demonstrate the `revert` statement.
-- A `getBalance` function to retrieve the Ether balance of the caller's address.
+- A `chairperson` variable that stores the address of the contract deployer.
+- A `voters` mapping to track which addresses have the right to vote.
+- A `proposals` array to store the list of proposals.
+- Functions to add proposals, give voting rights, cast votes, remove proposals, end voting, and handle emergencies.
 
 ## Error Handling
 
 ### `require()`
 
 The `require()` statement is used to validate certain conditions before further execution of a function.
-
 
 Example:
 ```solidity
@@ -52,9 +49,9 @@ revert("This function always reverts");
 To use this contract in the Remix IDE, follow these steps:
 
 1. Open the Remix IDE (https://remix.ethereum.org/).
-2. Create a new Solidity file and name it "SimpleBank.sol".
-3. Copy and paste the contract code into the "SimpleBank.sol" file.
-4. Select the appropriate Solidity compiler version (0.8.25 or higher) in the Remix IDE.
+2. Create a new Solidity file and name it "Voting.sol".
+3. Copy and paste the contract code into the "Voting.sol" file.
+4. Select the appropriate Solidity compiler version (0.8.0 or higher) in the Remix IDE.
 5. Compile the contract by clicking the "Compile" button.
 6. Once compiled successfully, you can interact with the contract using the Remix IDE's built-in console or by deploying it to a test network.
 
@@ -62,56 +59,76 @@ To use this contract in the Remix IDE, follow these steps:
 
 ## Contract Functionality
 
-### `deposit()`
+### `addProposal(string description)`
 
-The `deposit` function allows users to deposit Ether into their account. It requires a positive Ether amount to be sent. The function updates the user's balance and emits a `Deposit` event.
-
-Example usage:
-```solidity
-contractInstance.deposit{value: 1 ether}();
-```
-
-### `withdraw(uint256 amount)`
-
-The `withdraw` function enables users to withdraw a specified amount of Ether from their account. It checks for sufficient balance before proceeding and emits a `Withdrawal` event upon successful withdrawal.
+The `addProposal` function allows the chairperson to add a new proposal with a given description.
 
 Example usage:
 ```solidity
-contractInstance.withdraw(1 ether);
+contractInstance.addProposal("New Proposal");
 ```
-### `stopContract()`
 
-The `stopContract` function stops the contract, preventing any deposits or withdrawals until the contract is resumed.
+### `giveRightToVote(address voter)`
+
+The `giveRightToVote` function grants the right to vote to a specified address. It checks if the voter already has voting rights before granting.
 
 Example usage:
 ```solidity
-contractInstance.stopContract();
+contractInstance.giveRightToVote(0x1234...);
 ```
-### `resumeContract()`
 
-The `resumeContract` function resumes the contract, allowing deposits and withdrawals to continue.
+### `vote(uint256 proposalIndex)`
+
+The `vote` function allows a voter to vote for a specific proposal. It ensures the voter has the right to vote and the proposal index is valid.
 
 Example usage:
 ```solidity
-contractInstance.resumeContract();
+contractInstance.vote(0);
 ```
-### `forceRevert()`
 
-The `forceRevert` function demonstrates the revert statement by always reverting with a specific error message.
+### `getProposal(uint256 proposalIndex)`
+
+The `getProposal` function retrieves the description and vote count for a given proposal index.
 
 Example usage:
 ```solidity
-contractInstance.forceRevert();
+(string memory description, uint256 voteCount) = contractInstance.getProposal(0);
 ```
 
-### `getBalance()`
+### `removeProposal(uint256 proposalIndex)`
 
-The `getBalance` function retrieves the Ether balance of the caller's address.
+The `removeProposal` function allows the chairperson to remove a proposal at a specific index. It ensures the proposal index is valid and shifts remaining proposals.
 
 Example usage:
 ```solidity
-uint256 balance = contractInstance.getBalance();
+contractInstance.removeProposal(0);
 ```
+
+### `endVoting()`
+
+The `endVoting` function ends the voting process, calculates the winning proposal, and resets the vote counts. It ensures there are proposals to vote on and uses `assert` to check internal consistency.
+
+Example usage:
+```solidity
+contractInstance.endVoting();
+```
+
+### `emergencyStop()`
+
+The `emergencyStop` function triggers an emergency stop, reverting any transactions and providing an error message.
+
+Example usage:
+```solidity
+contractInstance.emergencyStop();
+```
+
+### State Variables
+
+- **`chairperson`**: Stores the address of the chairperson who deployed the contract. It is of type `address`.
+- **`proposals`**: An array of proposals in the contract. It is of type `Proposal[]` (array of Proposal structs).
+- **`voters`**: A mapping to track which addresses have the right to vote. It is of type `mapping(address => bool)`.
+
+This detailed breakdown of the contract functions and state variables should help you understand and present the functionality of the Voting contract effectively.
 
 
 ## 🌟 **Acknowledgement** 🌟
